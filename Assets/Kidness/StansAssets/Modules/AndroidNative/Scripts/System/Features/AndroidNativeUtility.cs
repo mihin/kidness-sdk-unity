@@ -296,8 +296,9 @@ public class AndroidNativeUtility : SA.Common.Pattern.Singleton<AndroidNativeUti
 		locale.LanguageCode = storeData[2];
 		locale.DisplayLanguage = storeData[3];
 
-		LocaleInfoLoaded(locale);
+	    locale.OriginalData = data;
 
+        LocaleInfoLoaded(locale);
 	}
 
 	private void OnPackagesListLoaded(string data) {

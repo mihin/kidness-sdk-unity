@@ -16,4 +16,5 @@ public class AN_Locale {
 	//Returns the name of this locale's language, localized to locale. If the language name is unknown, the language code is returned.
 	public string DisplayLanguage;
 
+    public string OriginalData;
 }
