@@ -41,7 +41,7 @@ public class AndroidNative {
 	// --------------------------------------
 	// Twitter
 	// --------------------------------------
-	
+	/*
 	public static void TwitterInit(string consumer_key, string consumer_secret) {
 		CallAndroidNativeBridge("TwitterInit", consumer_key, consumer_secret);
 	}
@@ -65,7 +65,7 @@ public class AndroidNative {
 	public static void LogoutFromTwitter() {
 		CallAndroidNativeBridge("LogoutFromTwitter");
 	}
-
+    */
 
 
 

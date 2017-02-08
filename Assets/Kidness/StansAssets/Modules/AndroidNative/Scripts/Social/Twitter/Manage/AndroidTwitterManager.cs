@@ -9,7 +9,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
-
+/*
 public class AndroidTwitterManager : SA.Common.Pattern.Singleton<AndroidTwitterManager>, TwitterManagerInterface {
 
 
@@ -256,3 +256,4 @@ public class AndroidTwitterManager : SA.Common.Pattern.Singleton<AndroidTwitterM
 
 }
 
+*/
