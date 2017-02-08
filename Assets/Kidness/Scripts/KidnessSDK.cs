@@ -5,7 +5,7 @@ using UnityEngine;
 public class KidnessSDK : MonoBehaviour {
 
 	void Start () {
-		//AndroidNative.TwitterInit();
+		//AndroidNative.
 	}
 	
 	void Update () {
