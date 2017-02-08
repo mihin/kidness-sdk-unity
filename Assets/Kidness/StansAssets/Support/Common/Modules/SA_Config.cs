@@ -23,9 +23,9 @@ namespace SA.Common {
 		public const string SUPPORT_EMAIL 				= "support@stansassets.com";
 		public const string WEBSITE_ROOT_URL 			= "https://stansassets.com/";
 
-        public const string BUNDLES_PATH            	 = "Plugins/StansAssets/Bundles/";
-        public const string MODULS_PATH 	 			 = "Plugins/StansAssets/Modules/";
-		public const string SUPPORT_MODULS_PATH 	 	= "Plugins/StansAssets/Support/";
+        public const string BUNDLES_PATH            	 = "Kidness/StansAssets/Bundles/";
+        public const string MODULS_PATH 	 			 = "Kidness/StansAssets/Modules/";
+		public const string SUPPORT_MODULS_PATH 	 	= "Kidness/StansAssets/Support/";
 
 
 		public const string COMMON_LIB_PATH 			= SUPPORT_MODULS_PATH 	+ "Common/";
