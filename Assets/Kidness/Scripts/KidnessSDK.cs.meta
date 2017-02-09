@@ -1,10 +1,12 @@
 fileFormatVersion: 2
 guid: d9408bd3daf7a2c4593f509826f6dc0d
-timeCreated: 1486549834
+timeCreated: 1486657000
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - SurveyPalePrefab: {fileID: 1562888034568296, guid: 6f8a064905e3a444dadf6a3e89aa78c0,
+      type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

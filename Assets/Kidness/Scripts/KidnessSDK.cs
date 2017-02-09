@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class KidnessSDK : MonoBehaviour
 {
+    public GameObject SurveyPlayerPrefab;
+    public GameObject SurveyGO;
 
-	void Start ()
+    void Start ()
 	{
 	    OnSubscribe();
 	    InitAppMetrica();
@@ -65,8 +67,14 @@ public class KidnessSDK : MonoBehaviour
     public string android_id = "";
     public AN_Locale locale;
 
+    public UserSurveyResult surveyResult;
+    private bool isSurvey = false;
+
     void OnGUI()
     {
+        if (isSurvey)
+            return;
+
         const int w = 400;
         const int h = 80;
         int height_offset = 0;
@@ -128,6 +136,48 @@ public class KidnessSDK : MonoBehaviour
             height_offset += h;
         }
 
+        if (surveyResult == null)
+        {
+            if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Start Player Survey"))
+            {
+                UserSurveyPopup survey = null;
+                if (SurveyGO != null)
+                {
+                    SurveyGO.SetActive(true);
+                    survey = SurveyGO.GetComponent<UserSurveyPopup>();
+                }
+                else
+                {
+                    survey = FindObjectOfType<UserSurveyPopup>();
+                }
+                if (survey == null)
+                {
+                    Canvas canvas = FindObjectOfType<Canvas>();
+                    GameObject surveyGO = Instantiate(SurveyPlayerPrefab);
+                    surveyGO.transform.parent = canvas.transform;
+                    surveyGO.transform.localPosition = Vector3.zero;
+                    surveyGO.SetActive(true);
+                    survey = surveyGO.GetComponent<UserSurveyPopup>();
+                }
+
+                survey.OnSurveyFinished += delegate(UserSurveyResult result)
+                {
+                    isSurvey = false;
+                    surveyResult = result;
+                };
+                survey.StartSurvey();
+
+                isSurvey = true;
+            }
+            height_offset += h;
+
+        }
+        else
+        {
+            GUI.Label(new Rect(width_offset, height_offset, w, h), 
+                "Player is " + surveyResult.Age + ", " + (surveyResult.IsBoy?"Boy":"Girl"));
+            height_offset += h;
+        }
     }
 #endregion
 }
