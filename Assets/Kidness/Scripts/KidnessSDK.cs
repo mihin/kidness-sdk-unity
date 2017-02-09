@@ -9,6 +9,9 @@ public class KidnessSDK : MonoBehaviour
 	void Start ()
 	{
 	    OnSubscribe();
+
+        var metrica = AppMetrica.Instance;
+	    metrica.ReportEvent("Kidness SDK init event");
 	}
 
     void OnDisabled()
@@ -55,7 +58,8 @@ public class KidnessSDK : MonoBehaviour
         int height_offset = 0;
         int width_offset = 10;
 
-        GUI.Label(new Rect(width_offset, height_offset, w, h), "Kidness SDK Sample, inited ?= " + inited);
+        var metrica = AppMetrica.Instance;
+        GUI.Label(new Rect(width_offset, height_offset, w, h), "Kidness SDK Sample, YandexMetrika: " + metrica.LibraryVersion);
         height_offset += h;
 
         if (!inited)
