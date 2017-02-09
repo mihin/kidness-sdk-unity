@@ -264,7 +264,7 @@ public class SocialPlatfromSettingsEditor : Editor {
 		SocialProxyActivity.SetValue("android:theme", "@android:style/Theme.Translucent.NoTitleBar");
 			
 		if(launcherActivity.Name == "com.androidnative.AndroidNativeBridge") {
-			launcherActivity.SetName("com.unity3d.player.UnityPlayerNativeActivity");
+			launcherActivity.SetName("com.unity3d.player.UnityPlayerActivity");
 		}
 			
 			

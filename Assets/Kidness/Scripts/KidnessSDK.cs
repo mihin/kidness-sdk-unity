@@ -9,14 +9,21 @@ public class KidnessSDK : MonoBehaviour
 	void Start ()
 	{
 	    OnSubscribe();
-
-        var metrica = AppMetrica.Instance;
-	    metrica.ReportEvent("Kidness SDK init event");
+	    InitAppMetrica();
 	}
 
     void OnDisabled()
     {
         OnUnsubscribe();
+    }
+
+    private void InitAppMetrica()
+    {
+        IYandexAppMetrica metrica = AppMetrica.Instance;
+        metrica.OnActivation += OnAppMetricaActivation;
+        metrica.ActivateWithAPIKey("71ca63a9-eb21-4617-8a23-69d9d2717dea");
+        //metrica.SetLoggingEnabled();
+        metrica.ReportEvent("Kidness SDK init event");
     }
 
     private void OnSubscribe ()
@@ -25,20 +32,25 @@ public class KidnessSDK : MonoBehaviour
         AndroidNativeUtility.LocaleInfoLoaded += OnLocaleInfoLoaded;
     }
 
+    private void OnUnsubscribe()
+    {
+        AndroidNativeUtility.OnAndroidIdLoaded -= OnOnAndroidIdLoaded;
+        AndroidNativeUtility.LocaleInfoLoaded -= OnLocaleInfoLoaded;
+    }
+
+#region Callbacks
+    private void OnOnAndroidIdLoaded(string s)
+    {
+        android_id = s;
+    }
     private void OnLocaleInfoLoaded(AN_Locale anLocale)
     {
         locale = anLocale;
     }
 
-    private void OnUnsubscribe()
+    private void OnAppMetricaActivation(YandexAppMetricaConfig config)
     {
-        AndroidNativeUtility.OnAndroidIdLoaded -= OnOnAndroidIdLoaded;
-    }
-
-    #region Callbacks
-    private void OnOnAndroidIdLoaded(string s)
-    {
-        android_id = s;
+        appMetricaStatus += "Location=" + config.Location + ", " + config.ApiKey;
     }
 
 #endregion
@@ -47,6 +59,8 @@ public class KidnessSDK : MonoBehaviour
 #region Test HUD
 
     private bool inited = false;
+
+    private string appMetricaStatus;
 
     public string android_id = "";
     public AN_Locale locale;
@@ -58,8 +72,7 @@ public class KidnessSDK : MonoBehaviour
         int height_offset = 0;
         int width_offset = 10;
 
-        var metrica = AppMetrica.Instance;
-        GUI.Label(new Rect(width_offset, height_offset, w, h), "Kidness SDK Sample, YandexMetrika: " + metrica.LibraryVersion);
+        GUI.Label(new Rect(width_offset, height_offset, w, h), "Kidness SDK Sample");
         height_offset += h;
 
         if (!inited)
@@ -69,6 +82,20 @@ public class KidnessSDK : MonoBehaviour
                 AndroidNativeUtility anu = AndroidNativeUtility.Instance;
                 inited = true;
             }
+            height_offset += h;
+        }
+
+        if (!string.IsNullOrEmpty(appMetricaStatus))
+        {
+            GUI.Label(new Rect(width_offset, height_offset, w, h),
+                "AppMetrica initialized: " + appMetricaStatus);
+            height_offset += h;
+        }
+        else
+        {
+            var metrica = AppMetrica.Instance;
+            GUI.Label(new Rect(width_offset, height_offset, w, h),
+                "AppMetrica not initialized. version " + metrica.LibraryVersion);
             height_offset += h;
         }
 

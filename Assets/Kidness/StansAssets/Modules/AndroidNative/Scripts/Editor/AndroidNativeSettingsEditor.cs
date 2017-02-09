@@ -794,11 +794,11 @@ public class AndroidNativeSettingsEditor : Editor {
 		targetSdk.SetValue ("android:targetSdkVersion", "25");
 		
 		if(launcherActivity.Name == "com.androidnative.AndroidNativeBridge") {
-			launcherActivity.SetName("com.unity3d.player.UnityPlayerNativeActivity");
+			launcherActivity.SetName("com.unity3d.player.UnityPlayerActivity");
 		}
 		
 		foreach (KeyValuePair<int, SA.Manifest.ActivityTemplate> a in application.Activities) {
-			if (a.Value.Name.Equals("com.unity3d.player.UnityPlayerNativeActivity") && !a.Value.IsLauncher) {
+			if (a.Value.Name.Equals("com.unity3d.player.UnityPlayerActivity") && !a.Value.IsLauncher) {
 				application.RemoveActivity(a.Value);
 				break;
 			}

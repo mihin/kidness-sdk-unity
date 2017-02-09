@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.unity3d.player"
+    package="com.kidness.sdk"
     android:installLocation="preferExternal"
     android:theme="@android:style/Theme.NoTitleBar"
     android:versionCode="1"
@@ -27,12 +27,8 @@
             android:name="com.google.android.gms.appstate.APP_ID"
             android:value="@string/app_id" />
 
-        <receiver android:name="com.androidnative.features.notifications.LocalNotificationReceiver" />
-
-        <service android:name="com.androidnative.gcm.GcmIntentService" />
-
         <activity
-            android:name="com.unity3d.player.UnityPlayerNativeActivity"
+            android:name="com.unity3d.player.UnityPlayerActivity"
             android:label="@string/app_name" >
             <meta-data
                 android:name="unityplayer.UnityActivity"
@@ -47,6 +43,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Android native -->
         <activity
             android:name="com.androidnative.AndroidNativeProxy"
             android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
@@ -76,15 +74,39 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity
-            android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
-        <activity
-            android:name="com.androidnative.billing.core.AN_BillingProxyActivity"
-            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
-            android:label="@string/app_name"
-            android:launchMode="singleTask"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <receiver android:name="com.androidnative.features.notifications.LocalNotificationReceiver" />
+        <!-- Android native end -->
+
+
+        <!-- AppMetrica Services and Receivers -->
+        <service
+            android:name="com.yandex.metrica.MetricaService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":Metrica" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="com.yandex.metrica.IMetricaService" />
+
+                <data android:scheme="metrica" />
+            </intent-filter>
+
+            <meta-data
+                android:name="metrica:api:level"
+                android:value="52" />
+        </service>
+
+        <receiver
+            android:name="com.yandex.metrica.MetricaEventHandler"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+        <!-- AppMetrica end -->
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -95,5 +117,6 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
 </manifest>
