@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
+using Kidness;
+
 public class AnotherSceneManager : MonoBehaviour
 {
     private const int DELAY_BACKGROUND_SEC = 120;

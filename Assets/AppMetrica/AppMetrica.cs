@@ -6,6 +6,9 @@
 using UnityEngine;
 using System.Collections;
 
+namespace Kidness
+{
+
 public class AppMetrica : MonoBehaviour
 {
     [SerializeField]
@@ -144,4 +147,5 @@ public class AppMetrica : MonoBehaviour
         }
     }
 
+}
 }

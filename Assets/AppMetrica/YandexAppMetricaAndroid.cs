@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 #if UNITY_ANDROID
 
+namespace Kidness
+{
+
+
 public class YandexAppMetricaAndroid : BaseYandexAppMetrica
 {
 
@@ -218,6 +222,7 @@ public static class YandexAppMetricaExtensionsAndroid
         location.Call ("setLongitude", self.Longitude);
         return location;
     }
+}
 }
 
 #endif

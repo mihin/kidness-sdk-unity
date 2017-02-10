@@ -2,6 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
+namespace Kidness
+{
+
 public abstract class BaseYandexAppMetrica : IYandexAppMetrica
 {
     private YandexAppMetricaConfig? _metricaConfig;
@@ -63,4 +66,5 @@ public abstract class BaseYandexAppMetrica : IYandexAppMetrica
 
     public abstract int LibraryApiLevel { get; }
 
+}
 }

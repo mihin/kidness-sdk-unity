@@ -2,6 +2,9 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+namespace Kidness
+{
+
 public class YandexAppMetricaDummy : BaseYandexAppMetrica
 {
 
@@ -71,4 +74,5 @@ public class YandexAppMetricaDummy : BaseYandexAppMetrica
 
     #endregion
 
+}
 }

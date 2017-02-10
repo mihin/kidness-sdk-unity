@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public delegate void ConfigUpdateHandler (YandexAppMetricaConfig config);
 
+namespace Kidness
+{
+
 public interface IYandexAppMetrica
 {
     /// <summary>
@@ -158,4 +161,5 @@ public interface IYandexAppMetrica
     /// </summary>
     /// <value>The library API level.</value>
     int LibraryApiLevel { get; }
+}
 }

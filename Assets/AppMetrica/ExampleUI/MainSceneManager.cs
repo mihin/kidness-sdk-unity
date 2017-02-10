@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
 
+using Kidness;
+
 public class MainSceneManager : MonoBehaviour
 {
     private GameObject nullGameObject = null;

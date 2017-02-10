@@ -8,10 +8,15 @@ public class KidnessSDK : MonoBehaviour
     public GameObject SurveyPlayerPrefab;
     public GameObject SurveyGO;
 
+    private Kidness.KidnessMetricaAdapter metrica;
+
     void Start ()
 	{
 	    OnSubscribe();
-	    InitAppMetrica();
+
+        metrica = new Kidness.KidnessMetricaAdapter();
+        metrica.OnActivation += OnAppMetricaActivation;
+        metrica.InitAppMetrica();
 	}
 
     void OnDisabled()
@@ -19,14 +24,6 @@ public class KidnessSDK : MonoBehaviour
         OnUnsubscribe();
     }
 
-    private void InitAppMetrica()
-    {
-        IYandexAppMetrica metrica = AppMetrica.Instance;
-        metrica.OnActivation += OnAppMetricaActivation;
-        metrica.ActivateWithAPIKey("71ca63a9-eb21-4617-8a23-69d9d2717dea");
-        //metrica.SetLoggingEnabled();
-        metrica.ReportEvent("Kidness SDK init event");
-    }
 
     private void OnSubscribe ()
     {
@@ -55,10 +52,18 @@ public class KidnessSDK : MonoBehaviour
         appMetricaStatus += "Location=" + config.Location + ", " + config.ApiKey;
     }
 
-#endregion
+    private void OnSurveyFinished(UserSurveyResult _surveyResult)
+    {
+        metrica.ReportPlayerInfo(surveyResult);
+
+        isSurvey = false;
+        surveyResult = _surveyResult;
+    }
+
+    #endregion
 
 
-#region Test HUD
+    #region Test HUD
 
     private bool inited = false;
 
@@ -101,9 +106,8 @@ public class KidnessSDK : MonoBehaviour
         }
         else
         {
-            var metrica = AppMetrica.Instance;
             GUI.Label(new Rect(width_offset, height_offset, w, h),
-                "AppMetrica not initialized. version " + metrica.LibraryVersion);
+                "AppMetrica not initialized");
             height_offset += h;
         }
 
@@ -159,14 +163,8 @@ public class KidnessSDK : MonoBehaviour
                     surveyGO.SetActive(true);
                     survey = surveyGO.GetComponent<UserSurveyPopup>();
                 }
-
-                survey.OnSurveyFinished += delegate(UserSurveyResult result)
-                {
-                    isSurvey = false;
-                    surveyResult = result;
-                };
+                survey.OnSurveyFinished += OnSurveyFinished;
                 survey.StartSurvey();
-
                 isSurvey = true;
             }
             height_offset += h;
@@ -179,5 +177,7 @@ public class KidnessSDK : MonoBehaviour
             height_offset += h;
         }
     }
-#endregion
+
+
+    #endregion
 }
