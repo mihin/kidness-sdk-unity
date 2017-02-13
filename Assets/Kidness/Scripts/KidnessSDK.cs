@@ -54,10 +54,9 @@ public class KidnessSDK : MonoBehaviour
 
     private void OnSurveyFinished(UserSurveyResult _surveyResult)
     {
-        metrica.ReportPlayerInfo(surveyResult);
-
-        isSurvey = false;
         surveyResult = _surveyResult;
+        isSurvey = false;
+        metrica.ReportPlayerInfo(surveyResult);
     }
 
     #endregion
@@ -157,9 +156,9 @@ public class KidnessSDK : MonoBehaviour
                 if (survey == null)
                 {
                     Canvas canvas = FindObjectOfType<Canvas>();
-                    GameObject surveyGO = Instantiate(SurveyPlayerPrefab);
-                    surveyGO.transform.parent = canvas.transform;
-                    surveyGO.transform.localPosition = Vector3.zero;
+                    GameObject surveyGO = Instantiate(SurveyPlayerPrefab, Vector3.zero, Quaternion.identity, canvas.transform);
+                    surveyGO.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+
                     surveyGO.SetActive(true);
                     survey = surveyGO.GetComponent<UserSurveyPopup>();
                 }
