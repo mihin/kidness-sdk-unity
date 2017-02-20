@@ -61,6 +61,11 @@ public class KidnessSDK : MonoBehaviour
         metrica.ReportSurveyPlayerInfo(surveyResult);
     }
 
+    private void OnOnAdsShown(string url)
+    {
+        adsStatus = url;
+    }
+
     #endregion
 
     #region Events
@@ -119,6 +124,8 @@ public class KidnessSDK : MonoBehaviour
     private bool inited = false;
 
     private string appMetricaStatus;
+
+    private string adsStatus;
 
     public string android_id = "";
     public AN_Locale locale;
@@ -232,8 +239,23 @@ public class KidnessSDK : MonoBehaviour
                 "Player is " + surveyResult.Age + ", " + (surveyResult.IsBoy?"Boy":"Girl"));
             height_offset += h;
         }
-    }
 
+
+        if (string.IsNullOrEmpty(adsStatus))
+        {
+            if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Show Ads"))
+            {
+                KidnessAds ads = FindObjectOfType<KidnessAds>();
+                ads.OnAdsShown += OnOnAdsShown;
+                ads.ShowAds();
+            }
+        }
+        else
+        {
+            GUI.Label(new Rect(width_offset, height_offset, w, h), "Ads was shown: " + adsStatus);
+        }
+        height_offset += h;
+    }
 
     #endregion
 }
