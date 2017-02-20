@@ -6,7 +6,7 @@ using UnityEngine;
 public class KidnessSDK : MonoBehaviour
 {
     public GameObject SurveyPlayerPrefab;
-    public GameObject SurveyGO;
+    public GameObject SurveyCanvasPrefab;
 
     private Kidness.KidnessMetricaAdapter metrica;
 
@@ -17,13 +17,15 @@ public class KidnessSDK : MonoBehaviour
         metrica = new Kidness.KidnessMetricaAdapter();
         metrica.OnActivation += OnAppMetricaActivation;
         metrica.InitAppMetrica();
+
+        OnStartUtilsStuff();
 	}
 
     void OnDisabled()
     {
+        OnStopUtilsStuff();
         OnUnsubscribe();
     }
-
 
     private void OnSubscribe ()
     {
@@ -37,7 +39,7 @@ public class KidnessSDK : MonoBehaviour
         AndroidNativeUtility.LocaleInfoLoaded -= OnLocaleInfoLoaded;
     }
 
-#region Callbacks
+    #region Callbacks
     private void OnOnAndroidIdLoaded(string s)
     {
         android_id = s;
@@ -56,7 +58,57 @@ public class KidnessSDK : MonoBehaviour
     {
         surveyResult = _surveyResult;
         isSurvey = false;
-        metrica.ReportPlayerInfo(surveyResult);
+        metrica.ReportSurveyPlayerInfo(surveyResult);
+    }
+
+    #endregion
+
+    #region Events
+
+    public void ReportNonProfitUser()
+    {
+        metrica.ReportNonProfitUser();
+    }
+
+    public void ReportFirstInapp()
+    {
+        metrica.ReportFirstInapp();
+        if (PlayerPrefs.GetInt(Preferences.DidBuyInapp, 0) == 0)
+        {
+            metrica.ReportFirstInappTimestamp(GetTotalAppUpTime());
+        };
+        PlayerPrefs.SetInt(Preferences.DidBuyInapp, 1);
+        PlayerPrefs.Save();
+    }
+
+    public void ReportAdsWatch()
+    {
+        metrica.ReportAdsWatch();
+    }
+
+    #endregion
+
+    #region Utils
+
+    private long appUpTime = 0;
+    private void OnStartUtilsStuff()
+    {
+        appUpTime = DateTime.Now.ToUniversalTime().Ticks;
+    }
+
+    private void OnStopUtilsStuff()
+    {
+        int totalTime = GetTotalAppUpTime();
+        PlayerPrefs.SetInt(Preferences.UpTime, totalTime);
+        PlayerPrefs.Save();
+        appUpTime = DateTime.Now.ToUniversalTime().Ticks;
+
+        metrica.ReportPlayTime(totalTime);
+    }
+
+    private int GetTotalAppUpTime()
+    {
+        return (int)(DateTime.Now.ToUniversalTime().Ticks - appUpTime + PlayerPrefs.GetInt(Preferences.UpTime, 0));
     }
 
     #endregion
@@ -144,18 +196,23 @@ public class KidnessSDK : MonoBehaviour
             if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Start Player Survey"))
             {
                 UserSurveyPopup survey = null;
-                if (SurveyGO != null)
-                {
-                    SurveyGO.SetActive(true);
-                    survey = SurveyGO.GetComponent<UserSurveyPopup>();
-                }
-                else
+                //if (SurveyGO != null)
+                //{
+                //    SurveyGO.SetActive(true);
+                //    survey = SurveyGO.GetComponent<UserSurveyPopup>();
+                //}
+                //else
                 {
                     survey = FindObjectOfType<UserSurveyPopup>();
                 }
                 if (survey == null)
                 {
                     Canvas canvas = FindObjectOfType<Canvas>();
+                    if (canvas == null)
+                    {
+                        GameObject canvasGO = Instantiate(SurveyCanvasPrefab, Vector3.zero, Quaternion.identity, canvas.transform);
+                        canvas = canvasGO.GetComponent<Canvas>();
+                    }
                     GameObject surveyGO = Instantiate(SurveyPlayerPrefab, Vector3.zero, Quaternion.identity, canvas.transform);
                     surveyGO.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
 
@@ -179,4 +236,10 @@ public class KidnessSDK : MonoBehaviour
 
 
     #endregion
+}
+
+class Preferences
+{
+    public const string UpTime = "KidnessSDK.UpTime";
+    public const string DidBuyInapp = "KidnessSDK.DidBuyInapp";
 }
