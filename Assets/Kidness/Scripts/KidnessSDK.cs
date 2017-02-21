@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Kidness;
+
 public class KidnessSDK : MonoBehaviour
 {
     public GameObject SurveyPlayerPrefab;
@@ -61,9 +63,19 @@ public class KidnessSDK : MonoBehaviour
         metrica.ReportSurveyPlayerInfo(surveyResult);
     }
 
-    private void OnOnAdsShown(string url)
+    private void OnAdsShown(string url)
     {
-        adsStatus = url;
+        adsStatus = "shown. " + url;
+    }
+
+    private void OnAdsClosed(string url)
+    {
+        adsStatus = "shown and closed. " + url;
+    }
+
+    private void OnAdsError(string error)
+    {
+        adsStatus = "error! " + error;
     }
 
     #endregion
@@ -246,16 +258,20 @@ public class KidnessSDK : MonoBehaviour
             if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Show Ads"))
             {
                 KidnessAds ads = FindObjectOfType<KidnessAds>();
-                ads.OnAdsShown += OnOnAdsShown;
+                ads.OnAdsShown += OnAdsShown;
+                ads.OnAdsError += OnAdsError;
+                ads.OnAdsClosed += OnAdsClosed;
                 ads.ShowAds();
             }
         }
         else
         {
-            GUI.Label(new Rect(width_offset, height_offset, w, h), "Ads was shown: " + adsStatus);
+            GUI.Label(new Rect(width_offset, height_offset, w, h), "Ads: " + adsStatus);
         }
         height_offset += h;
     }
+
+
 
     #endregion
 }
