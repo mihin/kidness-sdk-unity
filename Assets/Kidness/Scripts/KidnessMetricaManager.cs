@@ -14,7 +14,7 @@ namespace Kidness
         {
             metrica = AppMetrica.Instance;
             metrica.OnActivation += OnAppMetricaActivation;
-            metrica.ActivateWithAPIKey("71ca63a9-eb21-4617-8a23-69d9d2717dea");
+            metrica.ActivateWithAPIKey("9f97b208-1038-4631-b728-fbe7af513f2f");
             //metrica.SetLoggingEnabled();
             metrica.ReportEvent("Kidness SDK init event");
         }
