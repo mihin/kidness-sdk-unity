@@ -1,3 +1,3 @@
-[submodule "KidnessAndroid"]
-	path = KidnessAndroid
-	url = C:\\unity\\kochurinInc\\KidnessAndroid
+[submodule "kidness-android-submodule"]
+	path = kidness-android-submodule
+	url = ../kidness-android-submodule.git
