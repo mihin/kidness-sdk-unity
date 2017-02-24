@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
+#if UNITY_IOS
 using UnityEditor.iOS.Xcode;
+#endif
 using System.IO;
 using System.Collections;
 
@@ -40,6 +42,7 @@ public class PostprocessBuildPlayerAppMetrica
     [PostProcessBuild]
     public static void OnPostprocessBuild (BuildTarget buildTarget, string path)
     {
+#if UNITY_IOS
 #if UNITY_5
         var expectedTarget = BuildTarget.iOS;
 #else
@@ -68,5 +71,6 @@ public class PostprocessBuildPlayerAppMetrica
 
             File.WriteAllText (projectPath, project.WriteToString ());
         }
+#endif
     }
 }
