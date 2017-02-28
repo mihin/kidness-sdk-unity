@@ -18,34 +18,16 @@ public class UserSurveyPopup : MonoBehaviour
     public Button ButtonSexBoy;
     public Button ButtonSexGirl;
 
-    public Slider SliderAge;
-    public Text TextAge;
-    public Button ButtonAge;
-
     private UserSurveyResult SurveyResult;
 
     void Start ()
     {
         ButtonClose.onClick.AddListener(() => FinishSurvey(false));
-        SliderAge.onValueChanged.AddListener(OnAgeSlide);
         ButtonSexBoy.onClick.AddListener(() => OnSexButtonClick(true));
         ButtonSexGirl.onClick.AddListener(() => OnSexButtonClick(false));
-        ButtonAge.onClick.AddListener(() => FinishSurvey(true));
 
         if (SurveyResult == null)
             Reset();
-    }
-
-    private void OnAgeSlide(float val)
-    {
-        TextAge.text = "I'm " + val.ToString();
-        if (!ButtonAge.interactable)
-        {
-            ButtonAge.enabled = true;
-            ButtonAge.interactable = true;
-        }
-
-        SurveyResult.Age = Mathf.FloorToInt(val);
     }
 
     private void OnSexButtonClick(bool isBoy)
@@ -54,7 +36,16 @@ public class UserSurveyPopup : MonoBehaviour
         ShowQuestionAge();
     }
 
+    void OnAgeButtonClick(Button b)
+    {
+        int age = -1;
+        if (b != null && int.TryParse(b.name, out age))
+            SurveyResult.Age = age;
+        else
+            SurveyResult.Age = -1;
 
+        FinishSurvey();
+    }
 
     private void ShowQuestionSex()
     {
@@ -65,11 +56,6 @@ public class UserSurveyPopup : MonoBehaviour
     {
         PanelSex.SetActive(false);
         PanelAge.SetActive(true);
-
-        //ButtonAge.enabled = false;
-        ButtonAge.interactable = false;
-
-        TextAge.text = "I'm " + SliderAge.value.ToString();
     }
 
     private void Reset()
