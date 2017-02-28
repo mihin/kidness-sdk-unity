@@ -93,9 +93,16 @@ public class KidnessSDK : MonoBehaviour
 
     private void OnSurveyFinished(UserSurveyResult _surveyResult)
     {
-        surveyResult = _surveyResult;
         isSurvey = false;
-        metrica.ReportSurveyPlayerInfo(surveyResult);
+        if (_surveyResult == null)
+        {
+            Debug.Log("KidnessSDK :: OnSurveyFinished, no results.. =(");
+        }
+        else
+        {
+            surveyResult = _surveyResult;
+            metrica.ReportSurveyPlayerInfo(surveyResult);
+        }
     }
 
     private void OnAdsShown(string url)

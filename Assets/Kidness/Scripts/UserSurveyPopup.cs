@@ -13,6 +13,8 @@ public class UserSurveyPopup : MonoBehaviour
     public GameObject PanelSex;
     public GameObject PanelAge;
 
+    public Button ButtonClose;
+
     public Button ButtonSexBoy;
     public Button ButtonSexGirl;
 
@@ -24,10 +26,11 @@ public class UserSurveyPopup : MonoBehaviour
 
     void Start ()
     {
+        ButtonClose.onClick.AddListener(() => FinishSurvey(false));
         SliderAge.onValueChanged.AddListener(OnAgeSlide);
         ButtonSexBoy.onClick.AddListener(() => OnSexButtonClick(true));
         ButtonSexGirl.onClick.AddListener(() => OnSexButtonClick(false));
-        ButtonAge.onClick.AddListener(FinishSurvey);
+        ButtonAge.onClick.AddListener(() => FinishSurvey(true));
 
         if (SurveyResult == null)
             Reset();
@@ -83,9 +86,12 @@ public class UserSurveyPopup : MonoBehaviour
         ShowQuestionSex();
         SurveyResult = new UserSurveyResult();
     }
-    public void FinishSurvey()
+    public void FinishSurvey(bool success = true)
     {
-        OnSurveyFinished(SurveyResult);
+        if (success)
+            OnSurveyFinished(SurveyResult);
+        else
+            OnSurveyFinished(null);
         Reset();
     }
 
