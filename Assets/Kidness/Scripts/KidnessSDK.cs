@@ -10,13 +10,48 @@ public class KidnessSDK : MonoBehaviour
     public GameObject SurveyPlayerPrefab;
     public GameObject SurveyCanvasPrefab;
 
-    private Kidness.KidnessMetricaAdapter metrica;
+    private KidnessMetricaAdapter metrica;
+
+#region getters
+    private KidnessAds ads;
+    internal KidnessAds KidnessAds
+    {
+        get
+        {
+            if (ads == null)
+            {
+                ads = FindObjectOfType<KidnessAds>();
+                if (ads == null)
+                    ads = gameObject.AddComponent<KidnessAds>();
+
+                ads.OnAdsShown += OnAdsShown;
+                ads.OnAdsError += OnAdsError;
+                ads.OnAdsClosed += OnAdsClosed;
+            }
+            return ads;
+        }
+    }
+    private KidnessAPI api;
+    internal KidnessAPI KidnessAPI
+    {
+        get
+        {
+            if (api == null)
+            {
+                api = FindObjectOfType<KidnessAPI>();
+                if (api == null)
+                    api = gameObject.AddComponent<KidnessAPI>();
+            }
+            return api;
+        }
+    }
+#endregion
 
     void Start ()
 	{
 	    OnSubscribe();
 
-        metrica = new Kidness.KidnessMetricaAdapter();
+        metrica = new KidnessMetricaAdapter();
         metrica.OnActivation += OnAppMetricaActivation;
         metrica.InitAppMetrica();
 
@@ -252,16 +287,16 @@ public class KidnessSDK : MonoBehaviour
             height_offset += h;
         }
 
+        if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Request Ads"))
+        {
+            KidnessAds.RequestAds(KidnessAPI);
+        }
 
         if (string.IsNullOrEmpty(adsStatus))
         {
             if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Show Ads"))
             {
-                KidnessAds ads = FindObjectOfType<KidnessAds>();
-                ads.OnAdsShown += OnAdsShown;
-                ads.OnAdsError += OnAdsError;
-                ads.OnAdsClosed += OnAdsClosed;
-                ads.ShowAds();
+                KidnessAds.ShowAds();
             }
         }
         else

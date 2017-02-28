@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace Kidness
 
         public event OnAdsShownEvent OnAdsClosed;
 
-        private string url = "https://docs.unity3d.com/uploads/Main/ShadowIntro.png";
+        private string nextAdsURL;
         private SpriteRenderer renderer;
         private Camera myCamera;
 
@@ -40,13 +41,38 @@ namespace Kidness
             }
         }
 
-        public void ShowAds()
+        public void RequestAds(KidnessAPI kidnessAPI)
         {
+            kidnessAPI.CheckAvalibleAds(OnAdsAvailableRequest);
+        }
+
+        private void OnAdsAvailableRequest(bool success, string data)
+        {
+            Debug.Log("OnAdsAvailableRequest :: success?="+ success + ", data = " + data);
+
+            if (success)
+            {
+                nextAdsURL = "https://docs.unity3d.com/uploads/Main/ShadowIntro.png";
+            }
+            else
+            {
+                nextAdsURL = null;
+            }
+        }
+
+        public bool ShowAds()
+        {
+            if (string.IsNullOrEmpty(nextAdsURL))
+            {
+                status = AdsStatus.Error;
+                return false;
+            }
             status = AdsStatus.None;
 
             //myCamera.enabled = true;
             //renderer.enabled = true;
             StartCoroutine("LoadImage");
+            return true;
         }
 
         private void ProcessAdsClick()
@@ -62,7 +88,7 @@ namespace Kidness
             myCamera.enabled = false;
 
             if (OnAdsClosed != null)
-                OnAdsClosed(url);
+                OnAdsClosed(nextAdsURL);
         }
 
         private void OnImageLoaded(WWW www)
@@ -89,10 +115,10 @@ namespace Kidness
         {
             status = AdsStatus.Loading;
 
-            WWW www = new WWW(url);
+            WWW www = new WWW(nextAdsURL);
             yield return www;
 
-            url = www.url;
+            nextAdsURL = www.url;
 
             if (string.IsNullOrEmpty(www.error))
                 OnImageLoaded(www);
@@ -104,6 +130,8 @@ namespace Kidness
                     OnAdsError(www.error);
             }
         }
+
+
     }
 
     internal enum AdsStatus
