@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Kidness
+namespace Samekids
 {
 
 public abstract class BaseYandexAppMetrica : IYandexAppMetrica

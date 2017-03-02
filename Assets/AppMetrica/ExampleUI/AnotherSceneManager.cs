@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
-using Kidness;
+using Samekids;
 
 public class AnotherSceneManager : MonoBehaviour
 {

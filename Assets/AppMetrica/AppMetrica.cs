@@ -6,7 +6,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace Kidness
+namespace Samekids
 {
 
 public class AppMetrica : MonoBehaviour

@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-using Kidness;
+using Samekids;
 
 public class MainSceneManager : MonoBehaviour
 {

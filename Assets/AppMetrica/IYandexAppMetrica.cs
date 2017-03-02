@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public delegate void ConfigUpdateHandler (YandexAppMetricaConfig config);
 
-namespace Kidness
+namespace Samekids
 {
 
 public interface IYandexAppMetrica

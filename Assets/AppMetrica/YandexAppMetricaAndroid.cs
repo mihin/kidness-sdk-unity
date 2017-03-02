@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 #if UNITY_ANDROID
 
-namespace Kidness
+namespace Samekids
 {
 
 
