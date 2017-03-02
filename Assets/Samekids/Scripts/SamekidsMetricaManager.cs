@@ -16,7 +16,7 @@ namespace Samekids
             metrica.OnActivation += OnAppMetricaActivation;
             metrica.ActivateWithAPIKey("9f97b208-1038-4631-b728-fbe7af513f2f");
             //metrica.SetLoggingEnabled();
-            metrica.ReportEvent("Kidness SDK init event");
+            metrica.ReportEvent("Samekids SDK init event");
         }
 
         private void OnAppMetricaActivation(YandexAppMetricaConfig config)
@@ -39,6 +39,8 @@ namespace Samekids
                 parameters = new Dictionary<string, object>();
 
             metrica.ReportEvent(message, parameters);
+
+            Debug.Log("SamekidsMetricaAdapter :: ReportEvent: " + message);
         }
 
         internal void ReportSurveyPlayerInfo(UserSurveyResult survey)

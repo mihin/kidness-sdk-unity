@@ -96,7 +96,7 @@ public class SamekidsSDK : MonoBehaviour
         isSurvey = false;
         if (_surveyResult == null)
         {
-            Debug.Log("KidnessSDK :: OnSurveyFinished, no results.. =(");
+            Debug.Log("SamekidsSDK :: OnSurveyFinished, no results.. =(");
         }
         else
         {
@@ -193,11 +193,11 @@ public class SamekidsSDK : MonoBehaviour
             return;
 
         const int w = 400;
-        const int h = 80;
+        const int h = 70;
         int height_offset = 0;
         int width_offset = 10;
 
-        GUI.Label(new Rect(width_offset, height_offset, w, h), "Kidness SDK Sample");
+        GUI.Label(new Rect(width_offset, height_offset, w, h), "Samekids SDK Sample");
         height_offset += h;
 
         if (!inited)
@@ -271,7 +271,7 @@ public class SamekidsSDK : MonoBehaviour
                     Canvas canvas = FindObjectOfType<Canvas>();
                     if (canvas == null)
                     {
-                        GameObject canvasGO = Instantiate(SurveyCanvasPrefab, Vector3.zero, Quaternion.identity, canvas.transform);
+                        GameObject canvasGO = Instantiate(SurveyCanvasPrefab, Vector3.zero, Quaternion.identity);
                         canvas = canvasGO.GetComponent<Canvas>();
                     }
                     GameObject surveyGO = Instantiate(SurveyPlayerPrefab, Vector3.zero, Quaternion.identity, canvas.transform);
@@ -298,6 +298,7 @@ public class SamekidsSDK : MonoBehaviour
         {
             SamekidsAds.RequestAds(SamekidsApi);
         }
+        height_offset += h;
 
         if (string.IsNullOrEmpty(adsStatus))
         {
@@ -314,12 +315,11 @@ public class SamekidsSDK : MonoBehaviour
     }
 
 
-
     #endregion
 }
 
 class Preferences
 {
-    public const string UpTime = "KidnessSDK.UpTime";
-    public const string DidBuyInapp = "KidnessSDK.DidBuyInapp";
+    public const string UpTime = "SamekidsSDK.UpTime";
+    public const string DidBuyInapp = "SamekidsSDK.DidBuyInapp";
 }
