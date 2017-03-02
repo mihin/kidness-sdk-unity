@@ -41,9 +41,9 @@ namespace Samekids
             }
         }
 
-        public void RequestAds(SamekidsAPI samekidsApi)
+        public void RequestAds(SamekidsAPI samekidsApi, string android_id, string google_aid)
         {
-            samekidsApi.CheckAvalibleAds(OnAdsAvailableRequest);
+            samekidsApi.CheckAvalibleAds(OnAdsAvailableRequest, android_id, google_aid);
         }
 
         private void OnAdsAvailableRequest(bool success, string data)
@@ -65,6 +65,7 @@ namespace Samekids
             if (string.IsNullOrEmpty(nextAdsURL))
             {
                 status = AdsStatus.Error;
+                Debug.LogWarning("SamekidsAds :: ShowAds failed: url is empty");
                 return false;
             }
             status = AdsStatus.None;

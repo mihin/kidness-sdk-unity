@@ -181,7 +181,8 @@ public class SamekidsSDK : MonoBehaviour
 
     private string adsStatus;
 
-    public string android_id = "";
+    private string android_id = "android_id_111111";
+    private string google_aid = "google_aid_111111";
     public AN_Locale locale;
 
     public UserSurveyResult surveyResult;
@@ -296,7 +297,7 @@ public class SamekidsSDK : MonoBehaviour
 
         if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Request Ads"))
         {
-            SamekidsAds.RequestAds(SamekidsApi);
+            SamekidsAds.RequestAds(SamekidsApi, android_id, google_aid);
         }
         height_offset += h;
 
