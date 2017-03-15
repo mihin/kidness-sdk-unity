@@ -66,24 +66,37 @@ public class SamekidsSDK : MonoBehaviour
 
     private void OnSubscribe ()
     {
-        AndroidNativeUtility.OnAndroidIdLoaded += OnOnAndroidIdLoaded;
+        AndroidNativeUtility.OnAndroidIdLoaded += OnAndroidIdLoaded;
+        AndroidNativeUtility.OnGoogleAidLoaded += OnGoogleAidLoaded;
         AndroidNativeUtility.LocaleInfoLoaded += OnLocaleInfoLoaded;
+        AndroidNativeUtility.OnDeviceCodeLoaded += OnDeviceCodeLoaded;
     }
 
     private void OnUnsubscribe()
     {
-        AndroidNativeUtility.OnAndroidIdLoaded -= OnOnAndroidIdLoaded;
+        AndroidNativeUtility.OnAndroidIdLoaded -= OnAndroidIdLoaded;
+        AndroidNativeUtility.OnGoogleAidLoaded -= OnGoogleAidLoaded;
         AndroidNativeUtility.LocaleInfoLoaded -= OnLocaleInfoLoaded;
+        AndroidNativeUtility.OnDeviceCodeLoaded -= OnDeviceCodeLoaded;
     }
 
     #region Callbacks
-    private void OnOnAndroidIdLoaded(string s)
+    private void OnAndroidIdLoaded(string s)
     {
         android_id = s;
+    }
+    private void OnGoogleAidLoaded(string s)
+    {
+        google_aid = s;
     }
     private void OnLocaleInfoLoaded(AN_Locale anLocale)
     {
         locale = anLocale;
+    }
+
+    private void OnDeviceCodeLoaded(AN_DeviceCodeResult anDeviceCodeResult)
+    {
+        deviceCode = anDeviceCodeResult;
     }
 
     private void OnAppMetricaActivation(YandexAppMetricaConfig config)
@@ -150,9 +163,20 @@ public class SamekidsSDK : MonoBehaviour
     #region Utils
 
     private long appUpTime = 0;
+
     private void OnStartUtilsStuff()
     {
         appUpTime = DateTime.Now.ToUniversalTime().Ticks;
+
+//#if UNITY_EDITOR
+        appMetricaStatus = null;
+        adsStatus = null;
+        android_id = null;
+        google_aid = null;
+        locale = null;
+        deviceCode = null;
+        surveyResult = null;
+//#endif
     }
 
     private void OnStopUtilsStuff()
@@ -170,20 +194,26 @@ public class SamekidsSDK : MonoBehaviour
         return (int)(DateTime.Now.ToUniversalTime().Ticks - appUpTime + PlayerPrefs.GetInt(Preferences.UpTime, 0));
     }
 
-    #endregion
+#endregion
 
 
-    #region Test HUD
+#region Test HUD
 
     private bool inited = false;
 
     private string appMetricaStatus;
 
     private string adsStatus;
-
+    
+    [SerializeField]
     private string android_id = "android_id_111111";
+    [SerializeField]
     private string google_aid = "google_aid_111111";
-    public AN_Locale locale;
+    [SerializeField]
+    private AN_Locale locale;
+
+    [SerializeField]
+    private AN_DeviceCodeResult deviceCode;
 
     public UserSurveyResult surveyResult;
     private bool isSurvey = false;
@@ -201,15 +231,15 @@ public class SamekidsSDK : MonoBehaviour
         GUI.Label(new Rect(width_offset, height_offset, w, h), "Samekids SDK Sample");
         height_offset += h;
 
-        if (!inited)
-        {
-            if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Init Android SDK"))
-            {
-                AndroidNativeUtility anu = AndroidNativeUtility.Instance;
-                inited = true;
-            }
-            height_offset += h;
-        }
+        //if (!inited)
+        //{
+        //    if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Init Android SDK"))
+        //    {
+        //        AndroidNativeUtility anu = AndroidNativeUtility.Instance;
+        //        inited = true;
+        //    }
+        //    height_offset += h;
+        //}
 
         if (!string.IsNullOrEmpty(appMetricaStatus))
         {
@@ -236,6 +266,34 @@ public class SamekidsSDK : MonoBehaviour
         else
         {
             GUI.Label(new Rect(width_offset, height_offset, w, h), "Android ID = " + android_id);
+            height_offset += h;
+        }
+
+        if (string.IsNullOrEmpty(google_aid))
+        {
+            if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Load Google AID"))
+            {
+                AndroidNativeUtility.Instance.LoadGoogleAid();
+            }
+            height_offset += h;
+        }
+        else
+        {
+            GUI.Label(new Rect(width_offset, height_offset, w, h), "Google AID = " + google_aid);
+            height_offset += h;
+        }
+
+        if (deviceCode == null)
+        {
+            if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Load Device code"))
+            {
+                AndroidNativeUtility.Instance.ObtainUserDeviceCode("752952462331-tqgdkq6lg7o417rkpg63o5uqlud4asrn.apps.googleusercontent.com");
+            }
+            height_offset += h;
+        }
+        else
+        {
+            GUI.Label(new Rect(width_offset, height_offset, w, h), "Device ID = " + deviceCode.ToString());
             height_offset += h;
         }
 
@@ -297,7 +355,11 @@ public class SamekidsSDK : MonoBehaviour
 
         if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Request Ads"))
         {
+#if UNITY_EDITOR
+            SamekidsAds.RequestAds(SamekidsApi, "android_id11111", "google_aid11111");
+#else
             SamekidsAds.RequestAds(SamekidsApi, android_id, google_aid);
+#endif
         }
         height_offset += h;
 
@@ -316,7 +378,7 @@ public class SamekidsSDK : MonoBehaviour
     }
 
 
-    #endregion
+#endregion
 }
 
 class Preferences

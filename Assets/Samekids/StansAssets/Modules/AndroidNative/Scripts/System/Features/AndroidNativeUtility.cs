@@ -10,8 +10,9 @@ public class AndroidNativeUtility : SA.Common.Pattern.Singleton<AndroidNativeUti
 	//Actions
 	public static event Action<AN_PackageCheckResult> OnPackageCheckResult = delegate{};
 	public static event Action<string> OnAndroidIdLoaded = delegate{};
+    public static event Action<string> OnGoogleAidLoaded = delegate { };
 
-	public static event Action<string> InternalStoragePathLoaded = delegate{};
+    public static event Action<string> InternalStoragePathLoaded = delegate{};
 	public static event Action<string> ExternalStoragePathLoaded = delegate{};
 
 
@@ -81,7 +82,12 @@ public class AndroidNativeUtility : SA.Common.Pattern.Singleton<AndroidNativeUti
 		AndroidNative.LoadAndroidId();
 	}
 
-	public void GetInternalStoragePath() {
+    public void LoadGoogleAid()
+    {
+        AndroidNative.LoadGoogleAid();
+    }
+
+    public void GetInternalStoragePath() {
 		AndroidNative.GetInternalStoragePath();
 	}
 	
@@ -265,7 +271,12 @@ public class AndroidNativeUtility : SA.Common.Pattern.Singleton<AndroidNativeUti
 		OnAndroidIdLoaded(id);
 	}
 
-	private void OnPacakgeFound(string packageName) {
+    private void OnGoogleAidLoadedEvent(string id)
+    {
+        OnGoogleAidLoaded(id);
+    }
+
+    private void OnPacakgeFound(string packageName) {
 		AN_PackageCheckResult result = new AN_PackageCheckResult(packageName);
 		OnPackageCheckResult(result);
 	}

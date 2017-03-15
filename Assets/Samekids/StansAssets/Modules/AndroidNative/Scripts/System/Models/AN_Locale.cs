@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 
+[Serializable]
 public class AN_Locale {
 
 	//Returns the country code for this locale, or "" if this locale doesn't correspond to a specific country.

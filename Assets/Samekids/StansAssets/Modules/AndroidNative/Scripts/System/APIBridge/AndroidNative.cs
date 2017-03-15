@@ -111,7 +111,12 @@ public class AndroidNative {
 		CallAndroidNativeBridge("loadAndroidId");
 	}
 
-	public static void LoadPackagesList () {
+    public static void LoadGoogleAid()
+    {
+        CallAndroidNativeBridge("loadGoogleAid");
+    }
+
+    public static void LoadPackagesList () {
 		CallUtility("loadPackagesList");
 	}
 

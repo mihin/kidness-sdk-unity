@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 
+[Serializable]
 public class AN_DeviceCodeResult : SA.Common.Models.Result {
 
 	private string _deviceCode = string.Empty;
@@ -51,5 +53,8 @@ public class AN_DeviceCodeResult : SA.Common.Models.Result {
 		}
 	}
 
-
+    public override string ToString()
+    {
+        return string.Format("DeviceCode: {0}, UserCode: {1}, VerificationUrl: {2}, ExpiresIn: {3}, Interval: {4}", _deviceCode, _userCode, _verificationUrl, _expiresIn, _interval);
+    }
 }
