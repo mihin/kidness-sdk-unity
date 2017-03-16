@@ -106,7 +106,7 @@ public class SamekidsSDK : MonoBehaviour
 
     private void OnSurveyFinished(UserSurveyResult _surveyResult)
     {
-        isSurvey = false;
+        isSurveyActive = false;
         if (_surveyResult == null)
         {
             Debug.Log("SamekidsSDK :: OnSurveyFinished, no results.. =(");
@@ -121,16 +121,19 @@ public class SamekidsSDK : MonoBehaviour
     private void OnAdsShown(string url)
     {
         adsStatus = "shown. " + url;
+        isAdsActive = true;
     }
 
     private void OnAdsClosed(string url)
     {
         adsStatus = "shown and closed. " + url;
+        isAdsActive = false;
     }
 
     private void OnAdsError(string error)
     {
         adsStatus = "error! " + error;
+        isAdsActive = false;
     }
 
     #endregion
@@ -216,11 +219,12 @@ public class SamekidsSDK : MonoBehaviour
     private AN_DeviceCodeResult deviceCode;
 
     public UserSurveyResult surveyResult;
-    private bool isSurvey = false;
+    private bool isSurveyActive = false;
+    private bool isAdsActive = false;
 
     void OnGUI()
     {
-        if (isSurvey)
+        if (isSurveyActive || isAdsActive)
             return;
 
         const int w = 400;
@@ -341,7 +345,7 @@ public class SamekidsSDK : MonoBehaviour
                 }
                 survey.OnSurveyFinished += OnSurveyFinished;
                 survey.StartSurvey();
-                isSurvey = true;
+                isSurveyActive = true;
             }
             height_offset += h;
 

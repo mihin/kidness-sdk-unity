@@ -29,7 +29,10 @@ namespace Samekids
             Dictionary<string, object> parms = new Dictionary<string, object>();
             //string userInfo = Json.Serialize(new Dictionary<string, string>() {{"google_aid", google_aid}, {"android_id", android_id} });
             //string userInfo = "{" + string.Format("google_aid: {0}, android_id: {1}", google_aid, android_id) + "}";
-            parms.Add("user", new Dictionary<string, string>() { { "google_aid", google_aid }, { "android_id", android_id } });
+            //parms.Add("user", new Dictionary<string, string>() { { "google_aid", google_aid }, { "android_id", android_id } });
+
+            parms.Add("google_aid", google_aid);
+            parms.Add("android_id", android_id);
             parms.Add("application", Application.bundleIdentifier);
 #if TEST_MODE
             parms.Add("key", "test4test");
@@ -73,7 +76,11 @@ namespace Samekids
                             string showAdsJson = dict["show_ads"].ToString();
                             if (!string.IsNullOrEmpty(showAdsJson) && showAdsJson.ToLower() == "true")
                             {
-                                callback(true, dict["img"].ToString());
+                                string imgUrl = null;
+                                if (dict.ContainsKey("img") && !string.IsNullOrEmpty(imgUrl = dict["img"].ToString() ))
+                                    callback(true, imgUrl);
+                                else
+                                    callback(true, "Responce has no ads img url");
                             }
                             else
                             {

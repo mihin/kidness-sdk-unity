@@ -46,13 +46,14 @@ namespace Samekids
             samekidsApi.CheckAvalibleAds(OnAdsAvailableRequest, android_id, google_aid);
         }
 
-        private void OnAdsAvailableRequest(bool success, string data)
+        private void OnAdsAvailableRequest(bool success, string imgUrl)
         {
-            Debug.Log("OnAdsAvailableRequest :: success?="+ success + ", data = " + data);
+            Debug.Log("OnAdsAvailableRequest :: success?="+ success + ", imgUrl = " + imgUrl);
 
             if (success)
             {
-                nextAdsURL = "https://docs.unity3d.com/uploads/Main/ShadowIntro.png";
+                nextAdsURL = imgUrl;
+                //nextAdsURL = "https://docs.unity3d.com/uploads/Main/ShadowIntro.png";
             }
             else
             {
