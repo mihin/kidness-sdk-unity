@@ -179,7 +179,10 @@ public class SamekidsSDK : MonoBehaviour
         locale = null;
         deviceCode = null;
         surveyResult = null;
-//#endif
+        //#endif
+
+        AndroidNativeUtility.Instance.LoadAndroidId();
+        AndroidNativeUtility.Instance.LoadGoogleAid();
     }
 
     private void OnStopUtilsStuff()
@@ -203,24 +206,15 @@ public class SamekidsSDK : MonoBehaviour
 #region Test HUD
 
     private bool inited = false;
-
-    private string appMetricaStatus;
-
-    private string adsStatus;
-    
-    [SerializeField]
-    private string android_id = "android_id_111111";
-    [SerializeField]
-    private string google_aid = "google_aid_111111";
-    [SerializeField]
-    private AN_Locale locale;
-
-    [SerializeField]
-    private AN_DeviceCodeResult deviceCode;
-
-    public UserSurveyResult surveyResult;
     private bool isSurveyActive = false;
     private bool isAdsActive = false;
+    private string appMetricaStatus;
+    private string adsStatus;
+    private string android_id = "android_id_111111";
+    private string google_aid = "google_aid_111111";
+    private AN_Locale locale;
+    private AN_DeviceCodeResult deviceCode;
+    private UserSurveyResult surveyResult;
 
     void OnGUI()
     {
@@ -287,19 +281,19 @@ public class SamekidsSDK : MonoBehaviour
             height_offset += h;
         }
 
-        if (deviceCode == null)
-        {
-            if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Load Device code"))
-            {
-                AndroidNativeUtility.Instance.ObtainUserDeviceCode("752952462331-tqgdkq6lg7o417rkpg63o5uqlud4asrn.apps.googleusercontent.com");
-            }
-            height_offset += h;
-        }
-        else
-        {
-            GUI.Label(new Rect(width_offset, height_offset, w, h), "Device ID = " + deviceCode.ToString());
-            height_offset += h;
-        }
+        //if (deviceCode == null)
+        //{
+        //    if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Load Device code"))
+        //    {
+        //        AndroidNativeUtility.Instance.ObtainUserDeviceCode("752952462331-tqgdkq6lg7o417rkpg63o5uqlud4asrn.apps.googleusercontent.com");
+        //    }
+        //    height_offset += h;
+        //}
+        //else
+        //{
+        //    GUI.Label(new Rect(width_offset, height_offset, w, h), "Device ID = " + deviceCode.ToString());
+        //    height_offset += h;
+        //}
 
         if (locale == null)
         {
@@ -380,8 +374,6 @@ public class SamekidsSDK : MonoBehaviour
         }
         height_offset += h;
     }
-
-
 #endregion
 }
 
