@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 using Samekids;
@@ -50,11 +49,6 @@ public class SamekidsSDK : MonoBehaviour
     void Start ()
 	{
 	    OnSubscribe();
-
-        metrica = new SamekidsMetricaAdapter();
-        metrica.OnActivation += OnAppMetricaActivation;
-        metrica.InitAppMetrica();
-
         OnStartUtilsStuff();
 	}
 
@@ -101,7 +95,7 @@ public class SamekidsSDK : MonoBehaviour
 
     private void OnAppMetricaActivation(YandexAppMetricaConfig config)
     {
-        appMetricaStatus += "Location=" + config.Location + ", " + config.ApiKey;
+        appMetricaStatus += "Initialized: location=" + config.Location + ", appVersion=" + config.AppVersion;
     }
 
     private void OnSurveyFinished(UserSurveyResult _surveyResult)
@@ -138,7 +132,7 @@ public class SamekidsSDK : MonoBehaviour
 
     #endregion
 
-    #region Events
+    #region Metrica Events
 
     public void ReportNonProfitUser()
     {
@@ -163,15 +157,35 @@ public class SamekidsSDK : MonoBehaviour
 
     #endregion
 
+    private void LaunchUserSurvey()
+    {
+        UserSurveyPopup survey = null;
+        survey = FindObjectOfType<UserSurveyPopup>();
+        if (survey == null)
+        {
+            Canvas canvas = FindObjectOfType<Canvas>();
+            if (canvas == null)
+            {
+                GameObject canvasGO = Instantiate(SurveyCanvasPrefab, Vector3.zero, Quaternion.identity);
+                canvas = canvasGO.GetComponent<Canvas>();
+            }
+            GameObject surveyGO = Instantiate(SurveyPlayerPrefab, Vector3.zero, Quaternion.identity, canvas.transform);
+            surveyGO.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+
+            surveyGO.SetActive(true);
+            survey = surveyGO.GetComponent<UserSurveyPopup>();
+        }
+        survey.OnSurveyFinished += OnSurveyFinished;
+        survey.StartSurvey();
+        isSurveyActive = true;
+    }
+
     #region Utils
 
     private long appUpTime = 0;
-
     private void OnStartUtilsStuff()
     {
-        appUpTime = DateTime.Now.ToUniversalTime().Ticks;
-
-//#if UNITY_EDITOR
+#if !UNITY_EDITOR
         appMetricaStatus = null;
         adsStatus = null;
         android_id = null;
@@ -179,10 +193,22 @@ public class SamekidsSDK : MonoBehaviour
         locale = null;
         deviceCode = null;
         surveyResult = null;
-        //#endif
+#endif
+        appUpTime = DateTime.Now.ToUniversalTime().Ticks;
 
+        metrica = new SamekidsMetricaAdapter();
+        metrica.OnActivation += OnAppMetricaActivation;
+        metrica.InitAppMetrica();
+
+        StartCoroutine("OnDelayedUtilsStuff");
+    }
+
+    private IEnumerator OnDelayedUtilsStuff()
+    {
+        yield return new WaitForSeconds(1f);
         AndroidNativeUtility.Instance.LoadAndroidId();
         AndroidNativeUtility.Instance.LoadGoogleAid();
+        AndroidNativeUtility.Instance.LoadLocaleInfo();
     }
 
     private void OnStopUtilsStuff()
@@ -226,60 +252,18 @@ public class SamekidsSDK : MonoBehaviour
         int height_offset = 0;
         int width_offset = 10;
 
-        GUI.Label(new Rect(width_offset, height_offset, w, h), "Samekids SDK Sample");
-        height_offset += h;
+        string statusString = "";
+        statusString += "Samekids SDK Sample\n";
+        statusString += (string.IsNullOrEmpty(appMetricaStatus)
+            ? "AppMetrica not initialized"
+            : "AppMetrica initialized: " + appMetricaStatus)
+            + "\n";
+        statusString += "Android ID = " + android_id + "\n";
+        statusString += "Google AID = " + google_aid + "\n";
+        statusString += (locale!=null?"Device locale = " + locale.OriginalData: "No device locale info") + "\n";
 
-        //if (!inited)
-        //{
-        //    if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Init Android SDK"))
-        //    {
-        //        AndroidNativeUtility anu = AndroidNativeUtility.Instance;
-        //        inited = true;
-        //    }
-        //    height_offset += h;
-        //}
-
-        if (!string.IsNullOrEmpty(appMetricaStatus))
-        {
-            GUI.Label(new Rect(width_offset, height_offset, w, h),
-                "AppMetrica initialized: " + appMetricaStatus);
-            height_offset += h;
-        }
-        else
-        {
-            GUI.Label(new Rect(width_offset, height_offset, w, h),
-                "AppMetrica not initialized");
-            height_offset += h;
-        }
-
-
-        if (string.IsNullOrEmpty(android_id))
-        {
-            if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Load Android ID"))
-            {
-                AndroidNativeUtility.Instance.LoadAndroidId();
-            }
-            height_offset += h;
-        }
-        else
-        {
-            GUI.Label(new Rect(width_offset, height_offset, w, h), "Android ID = " + android_id);
-            height_offset += h;
-        }
-
-        if (string.IsNullOrEmpty(google_aid))
-        {
-            if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Load Google AID"))
-            {
-                AndroidNativeUtility.Instance.LoadGoogleAid();
-            }
-            height_offset += h;
-        }
-        else
-        {
-            GUI.Label(new Rect(width_offset, height_offset, w, h), "Google AID = " + google_aid);
-            height_offset += h;
-        }
+        GUI.Label(new Rect(width_offset, height_offset, w, 100), statusString);
+        height_offset += 100;
 
         //if (deviceCode == null)
         //{
@@ -295,51 +279,11 @@ public class SamekidsSDK : MonoBehaviour
         //    height_offset += h;
         //}
 
-        if (locale == null)
-        {
-            if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Load locale"))
-            {
-                AndroidNativeUtility.Instance.LoadLocaleInfo();
-            }
-            height_offset += h;
-        }
-        else
-        {
-            GUI.Label(new Rect(width_offset, height_offset, w, h), "Device locale = " + locale.OriginalData);
-            height_offset += h;
-        }
-
         if (surveyResult == null)
         {
             if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Start Player Survey"))
             {
-                UserSurveyPopup survey = null;
-                //if (SurveyGO != null)
-                //{
-                //    SurveyGO.SetActive(true);
-                //    survey = SurveyGO.GetComponent<UserSurveyPopup>();
-                //}
-                //else
-                {
-                    survey = FindObjectOfType<UserSurveyPopup>();
-                }
-                if (survey == null)
-                {
-                    Canvas canvas = FindObjectOfType<Canvas>();
-                    if (canvas == null)
-                    {
-                        GameObject canvasGO = Instantiate(SurveyCanvasPrefab, Vector3.zero, Quaternion.identity);
-                        canvas = canvasGO.GetComponent<Canvas>();
-                    }
-                    GameObject surveyGO = Instantiate(SurveyPlayerPrefab, Vector3.zero, Quaternion.identity, canvas.transform);
-                    surveyGO.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-
-                    surveyGO.SetActive(true);
-                    survey = surveyGO.GetComponent<UserSurveyPopup>();
-                }
-                survey.OnSurveyFinished += OnSurveyFinished;
-                survey.StartSurvey();
-                isSurveyActive = true;
+                LaunchUserSurvey();
             }
             height_offset += h;
 
@@ -353,22 +297,22 @@ public class SamekidsSDK : MonoBehaviour
 
         if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Request Ads"))
         {
-#if UNITY_EDITOR
-            SamekidsAds.RequestAds(SamekidsApi, "android_id11111", "google_aid11111");
-#else
+//#if UNITY_EDITOR
+//            SamekidsAds.RequestAds(SamekidsApi, "android_id11111", "google_aid11111");
+//#else
             SamekidsAds.RequestAds(SamekidsApi, android_id, google_aid);
-#endif
+//#endif
         }
         height_offset += h;
 
-        if (string.IsNullOrEmpty(adsStatus))
+        if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Show Ads"))
         {
-            if (GUI.Button(new Rect(width_offset, height_offset, w, h), "Show Ads"))
-            {
-                SamekidsAds.ShowAds();
-            }
+            SamekidsAds.ShowAds();
         }
-        else
+        height_offset += h;
+
+
+        if (string.IsNullOrEmpty(adsStatus))
         {
             GUI.Label(new Rect(width_offset, height_offset, w, h), "Ads: " + adsStatus);
         }
