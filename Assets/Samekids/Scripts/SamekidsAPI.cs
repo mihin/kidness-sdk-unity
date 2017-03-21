@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using ANMiniJSON;
+
 namespace Samekids
 {
     public class SamekidsAPI : MonoBehaviour
@@ -17,12 +18,17 @@ namespace Samekids
 #endif
         private const string ADS_API = SERVER + "/api/showAds/";
 
-        void Start()
+        public delegate void OnAdsResponseEvent(LoadAdsResponse response);
+        public event OnAdsResponseEvent OnAdsResponse;
+
+        private void Start()
         {
 
         }
 
-        public void CheckAvalibleAds(Action<bool, string> callback, string android_id, string google_aid)
+        #region Ads
+
+        public void RequestAds(string android_id, string google_aid)
         {
             //Debug.Log("SamekidsAPI :: CheckAvalibleAds. android_id=" + android_id + ", google_aid=" + google_aid);
 
@@ -48,7 +54,80 @@ namespace Samekids
             application: app_pack
             'key' => 'test4test'
             }
+            */
 
+            SendServerRequest(ADS_API, postData, ParseRequestAdsCallback);
+        }
+
+        private void ParseRequestAdsCallback(bool success, string data)
+        {
+            LoadAdsResponse response;
+            if (success)
+            {
+                try
+                {
+                    object json = Json.Deserialize(data);
+                    Dictionary<string, object> dict = json as Dictionary<string, object>;
+                    string successJson = dict["success"].ToString();
+                    if (!string.IsNullOrEmpty(successJson) && successJson.ToLower() == "true")
+                    {
+                        string showAdsJson = dict["show_ads"].ToString();
+                        if (!string.IsNullOrEmpty(showAdsJson) && showAdsJson.ToLower() == "true")
+                        {
+                            string imgUrl = null;
+                            if (!dict.ContainsKey("img") || !string.IsNullOrEmpty(imgUrl = dict["img"].ToString()))
+                            {
+                                response = new LoadAdsResponse(false, "Responce has no ads img url");
+                                //OnAdsAvailable(true, "Responce has no ads img url");
+                            }
+                            string gotoURL = null;
+                            if (!dict.ContainsKey("goto") || !string.IsNullOrEmpty(gotoURL = dict["goto"].ToString()))
+                            {
+                                //response = new AdsAvailableResponse(false, "Responce has no ads img url");
+                                Debug.LogWarning("ParseAdsCallback. No gotoURL in Ads response Json!");
+#if TEST_MODE
+                                gotoURL = "https://play.google.com/store/apps/details?id=biz.neoline.masha&hl=ru";
+#endif
+                            }
+                            float lockTime = 3;
+                            if (dict.ContainsKey("lock_time"))
+                            {
+                                lockTime = (float) dict["lock_time"];
+                            }
+
+                            response = new LoadAdsResponse(true, imgUrl, gotoURL, lockTime);
+                        }
+                        else
+                        {
+                            response = new LoadAdsResponse(false);
+                            //OnAdsAvailable(false, "Ads is not available");
+                        }
+                    }
+                    else
+                    {
+                        string error_message = dict["error_message"].ToString();
+                        int error_code = (int) dict["error_code"];
+                        response = new LoadAdsResponse(error_code, error_message);
+                        //OnAdsAvailable(false, "SERVER ERROR: " + );
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    response = new LoadAdsResponse(1, "Local Exception: " + e.ToString());
+                }
+            }
+            else
+            {
+                response = new LoadAdsResponse(1, data);
+            }
+
+            if (OnAdsResponse != null)
+                OnAdsResponse(response);
+            else
+                Debug.Log("ParseRequestAdsCallback: " + response);
+
+            /*
             успешный
             {
               success: true
@@ -62,52 +141,11 @@ namespace Samekids
               error_message: string
             }
             */
-            Action<bool, string> callbackInterpreter = (success, data) =>
-            {
-                if (success)
-                {
-                    try
-                    {
-                        object json = Json.Deserialize(data);
-                        Dictionary<string, object> dict = json as Dictionary<string, object>;
-                        string successJson = dict["success"].ToString();
-                        if (!string.IsNullOrEmpty(successJson) && successJson.ToLower() == "true")
-                        {
-                            string showAdsJson = dict["show_ads"].ToString();
-                            if (!string.IsNullOrEmpty(showAdsJson) && showAdsJson.ToLower() == "true")
-                            {
-                                string imgUrl = null;
-                                if (dict.ContainsKey("img") && !string.IsNullOrEmpty(imgUrl = dict["img"].ToString() ))
-                                    callback(true, imgUrl);
-                                else
-                                    callback(true, "Responce has no ads img url");
-                            }
-                            else
-                            {
-                                callback(false, "Ads is not available");
-                            }
-                        }
-                        else
-                        {
-                            callback(false, "SERVER ERROR: " + dict["error_message"].ToString());
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogException(e);
-                        callback(false, "Local Exception");
-                    }
-
-                }
-                else
-                {
-                    if (callback != null)
-                        callback(false, data);
-                }
-            };
-
-            SendServerRequest(ADS_API, postData, callbackInterpreter);
         }
+
+        #endregion
+
+        #region WWW utils
 
         private void SendServerRequest(string url, byte[] postData, Action<bool, string> callback)
         {
@@ -132,7 +170,7 @@ namespace Samekids
         private void SendPost(string url, byte[] postData, Action<bool, string> callback)
         {
             WWW www = new WWW(url, postData);
-            Debug.Log("SamekidsAPI :: SendPost. url=" + url + ", data="+ Encoding.ASCII.GetString(postData));
+            Debug.Log("SamekidsAPI :: SendPost. url=" + url + ", data=" + Encoding.ASCII.GetString(postData));
             StartCoroutine(WaitForRequest(www, callback));
         }
 
@@ -161,5 +199,6 @@ namespace Samekids
             }
         }
 
+        #endregion
     }
 }

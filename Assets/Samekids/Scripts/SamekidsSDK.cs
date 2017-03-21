@@ -26,6 +26,8 @@ public class SamekidsSDK : MonoBehaviour
                 ads.OnAdsShown += OnAdsShown;
                 ads.OnAdsError += OnAdsError;
                 ads.OnAdsClosed += OnAdsClosed;
+
+                ads.Init(SamekidsApi);
             }
             return ads;
         }
@@ -300,7 +302,7 @@ public class SamekidsSDK : MonoBehaviour
 //#if UNITY_EDITOR
 //            SamekidsAds.RequestAds(SamekidsApi, "android_id11111", "google_aid11111");
 //#else
-            SamekidsAds.RequestAds(SamekidsApi, android_id, google_aid);
+            SamekidsAds.RequestAds(android_id, google_aid);
 //#endif
         }
         height_offset += h;

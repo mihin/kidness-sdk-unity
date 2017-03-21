@@ -8,11 +8,6 @@ namespace Samekids
     [RequireComponent(typeof (Renderer))]
     public class SamekidsAds : MonoBehaviour
     {
-        [SerializeField]
-        private float ADS_LOCK_TIMER = 3; // sec
-
-        private string ADS_FOLLOW_LINK = "https://play.google.com/store/apps/details?id=biz.neoline.masha&hl=ru";
-
         public event OnAdsShownEvent OnAdsShown;
         public delegate void OnAdsShownEvent(string url);
 
@@ -25,11 +20,18 @@ namespace Samekids
         private UIOnClick CloseButton;
         private Transform trCloseButton;
 
+        private SamekidsAPI ApiManager;
         private SpriteRenderer renderer;
         private Camera myCamera;
 
-        private string nextAdsURL;
+        private LoadAdsResponse loadedAds;
         private AdsStatus status;
+
+        public void Init(SamekidsAPI samekidsApi)
+        {
+            ApiManager = samekidsApi;
+            ApiManager.OnAdsResponse += OnAdsResponseEvent;
+        }
 
         private void Start()
         {
@@ -48,6 +50,7 @@ namespace Samekids
         private void OnDisables()
         {
             CloseButton.OnClick -= ProcessCloseClick;
+            ApiManager.OnAdsResponse -= OnAdsResponseEvent;
         }
 
         private void Update()
@@ -59,29 +62,26 @@ namespace Samekids
             }
         }
 
-        public void RequestAds(SamekidsAPI samekidsApi, string android_id, string google_aid)
+        public void RequestAds(string android_id, string google_aid)
         {
-            samekidsApi.CheckAvalibleAds(OnAdsAvailableRequest, android_id, google_aid);
+            ApiManager.RequestAds(android_id, google_aid);
         }
 
-        private void OnAdsAvailableRequest(bool success, string imgUrl)
+        private void OnAdsResponseEvent(LoadAdsResponse response)
         {
-            Debug.Log("OnAdsAvailableRequest :: success?="+ success + ", imgUrl = " + imgUrl);
-
-            if (success)
-            {
-                nextAdsURL = imgUrl;
-                //nextAdsURL = "https://docs.unity3d.com/uploads/Main/ShadowIntro.png";
-            }
-            else
-            {
-                nextAdsURL = null;
-            }
+            //Debug.Log("OnAdsResponseEvent: " + response);
+            status = response.IsReadyToShow() ? AdsStatus.Ready : AdsStatus.None;
+            loadedAds = response;
         }
 
         public bool ShowAds()
         {
-            if (string.IsNullOrEmpty(nextAdsURL))
+            if (status != AdsStatus.Ready)
+            {
+                Debug.LogWarning("SamekidsAds :: ShowAds failed: ads isn't ready: " + loadedAds);
+                return false;
+            }
+            if (string.IsNullOrEmpty(loadedAds.imgURL))
             {
                 status = AdsStatus.Error;
                 Debug.LogWarning("SamekidsAds :: ShowAds failed: url is empty");
@@ -98,7 +98,7 @@ namespace Samekids
             if (OnAdsShown != null)
                 OnAdsShown(url);
 
-            if (ADS_LOCK_TIMER > 0)
+            if (loadedAds.lockTime > 0)
             {
                 status = AdsStatus.SuccessShownLocked;
                 StartCoroutine("StartLockAdsTimer");
@@ -113,7 +113,7 @@ namespace Samekids
 
         private IEnumerator StartLockAdsTimer()
         {
-            yield return new WaitForSeconds(ADS_LOCK_TIMER);
+            yield return new WaitForSeconds(loadedAds.lockTime);
             OnUnlockAdsTimer();
         }
 
@@ -129,16 +129,22 @@ namespace Samekids
 
         private void ProcessAdsClick()
         {
-            if (status == AdsStatus.SuccessShownLocked || status == AdsStatus.SuccessShown)
-                Debug.Log("SamekidsAds. ProcessAdsClick.");
+            if (status == AdsStatus.SuccessShownLocked || status == AdsStatus.SuccessShown || status == AdsStatus.SuccessShownAndClicked)
+                Debug.Log("SamekidsAds. ProcessAdsClick. gotoURL=" + loadedAds.gotoURL);
 
-            Application.OpenURL(ADS_FOLLOW_LINK);
+            if (!string.IsNullOrEmpty(loadedAds.gotoURL))
+            {
+                Application.OpenURL(loadedAds.gotoURL);
+                StopCoroutine("StartLockAdsTimer");
+                OnUnlockAdsTimer();
+                Wait(CloseAds, 0.5f);
+            }
+            if (status == AdsStatus.SuccessShown || status == AdsStatus.SuccessShownAndClicked)
+            {
+                Wait(CloseAds, 0.5f);
+            }
 
-            StopCoroutine("StartLockAdsTimer");
-            OnUnlockAdsTimer();
             status = AdsStatus.SuccessShownAndClicked;
-
-            Wait(CloseAds, 0.5f);
         }
 
         private void ProcessCloseClick()
@@ -159,7 +165,7 @@ namespace Samekids
             myCamera.enabled = false;
 
             if (OnAdsClosed != null)
-                OnAdsClosed(nextAdsURL);
+                OnAdsClosed(loadedAds.imgURL);
         }
 
         private void OnImageLoaded(WWW www)
@@ -181,17 +187,14 @@ namespace Samekids
             AdsShown(url);
         }
 
-
         private IEnumerator LoadImage()
         {
             status = AdsStatus.Loading;
-            string imageUrl = nextAdsURL;
+            string imageUrl = loadedAds.imgURL;
             if (!imageUrl.StartsWith("http"))
-                imageUrl = "http://" + nextAdsURL;
+                imageUrl = "http://" + loadedAds.imgURL;
             WWW www = new WWW(imageUrl);
             yield return www;
-
-            nextAdsURL = www.url;
 
             if (string.IsNullOrEmpty(www.error))
                 OnImageLoaded(www);
@@ -221,18 +224,5 @@ namespace Samekids
         #endregion
 
 
-    }
-
-    internal enum AdsStatus
-    {
-        None = 0,
-        Loading,
-        Error,
-        SuccessShownLocked,
-        SuccessShown,
-        SuccessShownAndClicked,
-        SuccessClosed,
-        Skipped,
-        Canceled
     }
 }
